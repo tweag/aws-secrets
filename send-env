@@ -5,15 +5,24 @@
 #
 # Synopsis:
 #
-# send-encrypted-to-s3 <filename>
-#   <filename> defaults to .env in the current directory.
+# send-encrypted-to-s3 -s <source file> -b <s3 bucket> -k <s3 key> -a <kms alias>
+#   <source file> defaults to .env
 #
 # Note, run 'aws configure' before running this, to set aws access keys.
-#
 
-src=${1:-.env}
-bucket=bduggan-test-bucket
-key=bduggan-test
+src=.env
+s3_bucket=
+s3_key=
+kms_alias=
+
+while getopts ":s:b:k:a:" opt; do
+    case $opt in
+        s) src=$OPTARG       ;;
+        b) s3_bucket=$OPTARG ;;
+        k) s3_key=$OPTARG    ;;
+        a) kms_alias=$OPTARG ;;
+    esac
+done
 
 die() {
     echo $@;
@@ -23,8 +32,9 @@ die() {
 [ -e "$src" ] || die "$src not found"
 
 tmp=`mktemp -d`
+encrypted=$tmp/data.enc
 
-key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$key'].TargetKeyId | [0]"`
+key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$kms_alias'].TargetKeyId | [0]"`
 
 aws kms encrypt \
     --key-id $key_id \
@@ -32,10 +42,8 @@ aws kms encrypt \
     --query CiphertextBlob \
     --output text \
     | base64 --decode \
-    > $tmp/$src.enc
+    > $encrypted
 
-aws s3api put-object --bucket $bucket --key $key --acl private --body $tmp/$src.enc
-
-cp $tmp/$src.enc /tmp/source.enc
+aws s3api put-object --bucket $s3_bucket --key $s3_key --acl private --body $encrypted
 
 rm -rf $tmp
