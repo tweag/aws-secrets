@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+kms_key_name = 'alias/bduggan-test'
+bucket = 'bduggan-test-bucket'
+s3_file = 'test-env'
+
 require 'aws-sdk'
 
 # basic S3 client
@@ -14,7 +18,7 @@ kms_client = Aws::KMS::Client.new(region: 'us-east-1')
 
 # retrieve cmk key id
 aliases = kms_client.list_aliases.aliases
-key = aliases.find { |alias_struct| alias_struct.alias_name == "alias/chime-secrets" }
+key = aliases.find { |alias_struct| alias_struct.alias_name == kms_key_name }
 key_id = key.target_key_id
 
 # encryption client
@@ -25,7 +29,7 @@ s3_encryption_client = Aws::S3::Encryption::Client.new(
 )
 
 # retrieve and decrypt .env from s3
-response = s3_encryption_client.get_object(bucket: 'chime-secrets', key: '.env')
+response = s3_encryption_client.get_object(bucket: bucket, key: s3_file)
 
 # build string of env vars to be exported.
 exports = ""

@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+source_file = 'test-env'
+destination_bucket='bduggan-test-bucket'
+destination_file = 'test-env'
+kms_keyname='alias/bduggan-test'
+
 require 'aws-sdk'
 
 # initialize S3 client
@@ -8,11 +13,11 @@ s3_client = Aws::S3::Client.new(region: 'us-east-1')
 # initialize KMS client
 kms_client = Aws::KMS::Client.new(region: 'us-east-1')
 
-# retrieve an 'aliase list' (array) of your AWS account's KMS encryption keys
+# retrieve an 'aliases list' (array) of your AWS account's KMS encryption keys
 aliases = kms_client.list_aliases.aliases
 
 # select your key
-key = aliases.find { |alias_struct| alias_struct.alias_name == "alias/your-key-name" }
+key = aliases.find { |alias_struct| alias_struct.alias_name == kms_keyname }
 
 # grab the key's id
 key_id = key.target_key_id
@@ -23,9 +28,9 @@ s3_encryption_client = Aws::S3::Encryption::Client.new(client: s3_client,
                                                        kms_client: kms_client)
 
 # specify the path to the file that will be encrypted
-path = File.expand_path('../../../../.env', __FILE__)
+path = source_file
 
 # open the file. 'put' it to S3. close the file.
 File.open(path) do |file|
-  s3_encryption_client.put_object(bucket: 'chime-secrets', key: '.env', body: file)
+  s3_encryption_client.put_object(bucket: destination_bucket, key: destination_file, body: file)
 end
