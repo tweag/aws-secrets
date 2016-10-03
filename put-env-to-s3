@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'aws-sdk'
+
+# initialize S3 client
+s3_client = Aws::S3::Client.new(region: 'us-east-1')
+
+# initialize KMS client
+kms_client = Aws::KMS::Client.new(region: 'us-east-1')
+
+# retrieve an 'aliase list' (array) of your AWS account's KMS encryption keys
+aliases = kms_client.list_aliases.aliases
+
+# select your key
+key = aliases.find { |alias_struct| alias_struct.alias_name == "alias/your-key-name" }
+
+# grab the key's id
+key_id = key.target_key_id
+
+# initialize the S3 encryption client
+s3_encryption_client = Aws::S3::Encryption::Client.new(client: s3_client,
+                                                       kms_key_id: key_id,
+                                                       kms_client: kms_client)
+
+# specify the path to the file that will be encrypted
+path = File.expand_path('../../../../.env', __FILE__)
+
+# open the file. 'put' it to S3. close the file.
+File.open(path) do |file|
+  s3_encryption_client.put_object(bucket: 'chime-secrets', key: '.env', body: file)
+end

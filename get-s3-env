@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'aws-sdk'
+
+# basic S3 client
+# note: the client will use the instance profile credentials
+#       when this script is called from the ec2 instance
+s3_client = Aws::S3::Client.new(region: 'us-east-1')
+
+# kms client
+# note: the client will use the instance profile credentials
+#       when this script is called from the ec2 instance
+kms_client = Aws::KMS::Client.new(region: 'us-east-1')
+
+# retrieve cmk key id
+aliases = kms_client.list_aliases.aliases
+key = aliases.find { |alias_struct| alias_struct.alias_name == "alias/chime-secrets" }
+key_id = key.target_key_id
+
+# encryption client
+s3_encryption_client = Aws::S3::Encryption::Client.new(
+  client: s3_client,
+  kms_key_id: key_id,
+  kms_client: kms_client,
+)
+
+# retrieve and decrypt .env from s3
+response = s3_encryption_client.get_object(bucket: 'chime-secrets', key: '.env')
+
+# build string of env vars to be exported.
+exports = ""
+response.body.read.each_line { |line| exports << "export #{line.chomp};" }
+
+puts exports
