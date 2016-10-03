@@ -44,6 +44,13 @@ aws kms encrypt \
     | base64 --decode \
     > $encrypted
 
-aws s3api put-object --bucket $s3_bucket --key $s3_key --acl private --body $encrypted > /tmp/errs
+aws s3api put-object \
+    --bucket $s3_bucket \
+    --key $s3_key \
+    --acl private \
+    --body $encrypted \
+    --output text \
+    --query 'None' \
+    | egrep -v '^None$'
 
 rm -rf $tmp
