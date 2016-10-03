@@ -18,7 +18,8 @@ die() {
 
 tmp=`mktemp -d`
 
-aws s3api get-object --bucket $s3_bucket --key $s3_key $tmp/out
+aws s3api get-object --bucket $s3_bucket --key $s3_key $tmp/out > /tmp/errs
+
 key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$kms_key'].TargetKeyId | [0]"`
 
 cp $tmp/out /tmp/decrypt.me
