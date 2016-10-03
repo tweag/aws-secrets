@@ -32,7 +32,4 @@ s3_encryption_client = Aws::S3::Encryption::Client.new(
 response = s3_encryption_client.get_object(bucket: bucket, key: s3_file)
 
 # build string of env vars to be exported.
-exports = ""
-response.body.read.each_line { |line| exports << "export #{line.chomp};" }
-
-puts exports
+puts response.body.read
