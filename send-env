@@ -5,7 +5,7 @@
 #
 # Synopsis:
 #
-# send-encrypted-to-s3 -s <source file> -b <s3 bucket> -k <s3 key> -a <kms alias>
+# send-env -s <source file> -b <s3 bucket> -k <s3 key> -a <kms alias>
 #   <source file> defaults to .env
 #
 # Note, run 'aws configure' before running this, to set aws access keys.
