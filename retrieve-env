@@ -1,0 +1,31 @@
+#!/bin/sh -e
+
+# retrieve-env
+#   Retrieve a file from s3, decrypt it and add it to the envirionment
+#
+# Synopsis:
+#   retrieve-env <s3_key>
+#   <s3_key> is a key in S3.  Default is .env.
+
+s3_key=${1:-bduggan-test}
+kms_key=bduggan-test
+s3_bucket=bduggan-test-bucket
+
+die() {
+    echo $@;
+    exit
+}
+
+tmp=`mktemp -d`
+
+aws s3api get-object --bucket $s3_bucket --key $s3_key $tmp/out
+key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$kms_key'].TargetKeyId | [0]"`
+
+cp $tmp/out /tmp/decrypt.me
+
+#aws kms decrypt --key-id $key_id --ciphertext-blob $tmp/out
+#aws kms decrypt --ciphertext-blob $tmp/out
+#aws kms decrypt  --ciphertext-blob fileb:///tmp/decrypt.me  --output text --query Plaintext | base64 --decode
+aws kms decrypt  --ciphertext-blob fileb:///tmp/decrypt.me --output text --query Plaintext | base64 --decode
+
+rm -rf $tmp

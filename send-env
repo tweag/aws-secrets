@@ -1,0 +1,41 @@
+#!/bin/sh -e
+
+# send-env
+#   Encrypt a file using a KMS key alias, then send it to an s3 bucket.
+#
+# Synopsis:
+#
+# send-encrypted-to-s3 <filename>
+#   <filename> defaults to .env in the current directory.
+#
+# Note, run 'aws configure' before running this, to set aws access keys.
+#
+
+src=${1:-.env}
+bucket=bduggan-test-bucket
+key=bduggan-test
+
+die() {
+    echo $@;
+    exit
+}
+
+[ -e "$src" ] || die "$src not found"
+
+tmp=`mktemp -d`
+
+key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$key'].TargetKeyId | [0]"`
+
+aws kms encrypt \
+    --key-id $key_id \
+    --plaintext fileb://$src \
+    --query CiphertextBlob \
+    --output text \
+    | base64 --decode \
+    > $tmp/$src.enc
+
+aws s3api put-object --bucket $bucket --key $key --acl private --body $tmp/$src.enc
+
+cp $tmp/$src.enc /tmp/source.enc
+
+rm -rf $tmp
