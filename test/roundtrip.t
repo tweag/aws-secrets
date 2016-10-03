@@ -1,12 +1,19 @@
 #!/bin/sh -e
 
 cd `dirname $0`
-../send-env test-env
-../retrieve-env bduggan-test > /tmp/out
-if diff -q test-env /tmp/out; then
+cd ..
+src=test/test-env
+dst=`mktemp`
+
+./send-env -s $src -b bduggan-test-bucket -k an-s3-key -a bduggan-test
+./retrieve-env     -b bduggan-test-bucket -k an-s3-key -a bduggan-test > $dst
+
+if diff -q $src $dst; then
     echo ok
 else
     echo fail
     exit 1
 fi
+
+rm $dst
 

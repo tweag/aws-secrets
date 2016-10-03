@@ -7,9 +7,17 @@
 #   retrieve-env <s3_key>
 #   <s3_key> is a key in S3.  Default is .env.
 
-s3_key=${1:-bduggan-test}
-kms_key=bduggan-test
-s3_bucket=bduggan-test-bucket
+s3_key=
+s3_bucket=
+kms_alias=
+
+while getopts ":s:b:k:a:" opt; do
+    case $opt in
+        b) s3_bucket=$OPTARG ;;
+        k) s3_key=$OPTARG    ;;
+        a) kms_alias=$OPTARG ;;
+    esac
+done
 
 die() {
     echo $@;
@@ -20,7 +28,7 @@ tmp=`mktemp -d`
 
 aws s3api get-object --bucket $s3_bucket --key $s3_key $tmp/out > /tmp/errs
 
-key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$kms_key'].TargetKeyId | [0]"`
+key_id=`aws kms list-aliases --output text --query "Aliases[?AliasName=='alias/$kms_alias'].TargetKeyId | [0]"`
 
 aws kms decrypt  --ciphertext-blob fileb://$tmp/out --output text --query Plaintext | base64 --decode
 
