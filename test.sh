@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 cd `dirname $0`
 src=`mktemp`
@@ -8,19 +8,26 @@ export MAGIC_WORDS=squeamish_ossifrage
 export RAND=$RANDOM
 DONE
 dst=`mktemp`
+n=1
 
-echo '# sending'
+ok() {
+    if [ "$?" == "0" ]; then
+        echo "ok $n - $@"
+    else
+        echo "not ok $n - $@"
+    fi
+    n=`expr $n + 1`
+}
+
+echo '1..3'
+
 ./send-env -s $src -b bduggan-test-bucket -k an-s3-key -a bduggan-test
-echo '# retrieving'
-./retrieve-env     -b bduggan-test-bucket -k an-s3-key -a bduggan-test > $dst
+ok 'sent'
+./retrieve-env -b bduggan-test-bucket -k an-s3-key -a bduggan-test > $dst
+ok 'retrieved'
 
-if diff -q $src $dst; then
-    echo "pass"
-    exit 0
-else
-    echo "fail"
-    exit 1
-fi
+diff -q $src $dst
+ok 'got the same thing back'
 
 rm $src
 rm $dst
