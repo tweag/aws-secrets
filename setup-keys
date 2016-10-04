@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+echo "Choose an instance profile:"
+instanceprofiles=`aws iam list-instance-profiles --query 'InstanceProfiles[*].InstanceProfileName' --output text`
+select profile in $instanceprofiles; do
+    break
+done
+echo "You chose $profile"
+
+echo "Choose a role:"
+roles=`aws iam list-roles --query 'Roles[*].RoleName' --output text`
+select role in $roles; do
+    break
+done
+echo "You chose $role"
+
+echo "Choose a key alias:"
+aliases=`aws kms list-aliases --query 'Aliases[*].AliasName' --output text | sed 's/alias\///g'`
+select alias in $aliases; do
+    break
+done
+echo "You chose $alias"
+
