@@ -51,6 +51,6 @@ aws s3api put-object \
     --body $encrypted \
     --output text \
     --query 'None' \
-    | egrep -v '^None$'
+    | egrep -v '^None$' || true
 
 rm -rf $tmp
