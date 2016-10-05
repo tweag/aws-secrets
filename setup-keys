@@ -1,23 +1,58 @@
 #!/bin/bash -e
 
-echo "Choose an instance profile:"
-instanceprofiles=`aws iam list-instance-profiles --query 'InstanceProfiles[*].InstanceProfileName' --output text`
-select profile in $instanceprofiles; do
-    break
-done
-echo "You chose $profile"
+echo 'Enter your application name.'
+echo 'This will be used to construct various defaults'.
+read -p 'Application name: ' app
 
-echo "Choose a role:"
-roles=`aws iam list-roles --query 'Roles[*].RoleName' --output text`
-select role in $roles; do
-    break
-done
-echo "You chose $role"
+# KMS Key
+read -p "Press return to generate a new key: " ok
+key_id=`aws kms create-key --query 'KeyMetadata.KeyId' --output text`
+echo "Generated key: $key_id"
 
-echo "Choose a key alias:"
-aliases=`aws kms list-aliases --query 'Aliases[*].AliasName' --output text | sed 's/alias\///g'`
-select alias in $aliases; do
-    break
-done
-echo "You chose $alias"
+# KMS Alias
+default=$app-env
+read -p "Enter an alias for this key (default: $default) :" in
+alias=${in:-$default}
+echo "creating alias: $alias"
+aws kms create-alias --target-key-id $key_id --alias-name "alias/$alias"
+
+# S3 bucket
+default=$app-env-bucket
+read -p "Enter an S3 bucket to create (default $default):" in
+bucket=${in:-$default}
+echo -n "creating..."
+# aws s3api create-bucket --bucket $bucket --acl private --output text
+
+# IAM Role for instances
+default=$app-approle
+read -p "Enter a role for application (default: $default) :" in
+approle=${in:-$default}
+
+doc=`mktemp`
+echo "creating role $approle";
+cat <<DONE >>$doc
+{
+  "Id": "key-$app-policy-$RANDOM",
+  "Version": "`date +%Y-%m-%d`",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service" : "ec2.amazonaws.com" },
+      "Action": "sts:AssumeRole",
+    },
+    {
+      "Effect" : "Allow",
+      "Action" : "s3:GetObject",
+      "Resource" : "arn:aws:s3:::$bucket"
+    }
+  ]
+}
+DONE
+aws iam create-role --role-name $approle --assume-role-policy-document file://$doc
+
+# Instance profile
+# Add role to instance profile
+
+# Role for users (or groups)
+# Assign role to users/groups
 
