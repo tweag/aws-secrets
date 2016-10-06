@@ -9,13 +9,12 @@ app=$1
 
 [ -z "$app" ] && die "Usage: $0 <application name>"
 
-[[ "$app" =~ ^[a-z0-9_]+$ ]] || die "THe application name should consist only of a-z, 0-9 or _ charaters."
+[[ "$app" =~ ^[a-z0-9_]+$ ]] || die "The application name should consist only of a-z, 0-9 or _ charaters."
 
 echo "Initializing resources for $app.";
 
+# KMS alias
 alias=$app-secrets
-
-# if $alias already exists, use that, otherise make a new key.
 found=`aws kms list-aliases --query "Aliases[?AliasName == 'alias/$alias'] | [0].TargetKeyId" --output text`
 if [ "$found" == "None" ]; then
     echo 'Making new key'
@@ -30,7 +29,6 @@ fi
 # S3 bucket
 bucket=$app-secrets
 found=`aws s3api list-buckets --query "Buckets[?Name == '$bucket'] | [0].Name" --output text`
-
 if [ "$found" == "None" ]; then
     echo "Creating bucket $bucket"
     made=`aws s3api create-bucket --bucket $bucket --acl private --output text`
@@ -38,37 +36,37 @@ else
     echo "Found existing bucket $bucket"
 fi
 
-exit
-
 # IAM Role for instances
-default=$app-approle
-read -p "Enter a role for application (default: $default) :" in
-approle=${in:-$default}
-
-doc=`mktemp`
-echo "creating role $approle";
-cat <<DONE >>$doc
-{
-  "Id": "key-$app-policy-$RANDOM",
-  "Version": "`date +%Y-%m-%d`",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": { "Service" : "ec2.amazonaws.com" },
-      "Action": "sts:AssumeRole"
-    },
-  ]
-}
-DONE
-echo $doc
-aws iam create-role --role-name $approle --assume-role-policy-document file://$doc
-
-    {
-      "Effect" : "Allow",
-      "Action" : "s3:GetObject",
-      "Resource" : "arn:aws:s3:::$bucket"
-    }
-
+instancerole=$app-secrets-instances
+found=`aws iam list-roles --query "Roles[?RoleName == '$instancerole'] | [0].RoleId" --output text`
+if [ "$found" == "None" ]; then
+    echo "Creating new role for instances: $instancerole"
+    policy=`mktemp`
+    echo "Writing to $policy"
+    cat <<-DONE >>$policy
+	{
+	  "Id": "key-$app-secrets-instance-policy",
+	  "Version": "2012-10-17",
+	  "Statement": [
+	    {
+	      "Effect": "Allow",
+	      "Principal": { "Service" : "ec2.amazonaws.com" },
+	      "Action": "sts:AssumeRole"
+	    }
+	  ]
+	}
+	DONE
+    aws iam create-role --role-name $instancerole --assume-role-policy-document file://$policy
+    #     {
+    #       "Effect" : "Allow",
+    #       "Action" : "s3:GetObject",
+    #       "Resource" : "arn:aws:s3:::$bucket"
+    #     }
+    #
+else
+    echo "Found existing role $instancerole ($found)"
+fi
+exit
 # Instance profile
 # Add role to instance profile
 
