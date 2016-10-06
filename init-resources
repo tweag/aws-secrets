@@ -1,0 +1,77 @@
+#!/bin/bash -e
+
+die() {
+    echo "$@"
+    exit
+}
+
+app=$1
+
+[ -z "$app" ] && die "Usage: $0 <application name>"
+
+[[ "$app" =~ ^[a-z0-9_]+$ ]] || die "THe application name should consist only of a-z, 0-9 or _ charaters."
+
+echo "Initializing resources for $app.";
+
+alias=$app-secrets
+
+# if $alias already exists, use that, otherise make a new key.
+found=`aws kms list-aliases --query "Aliases[?AliasName == 'alias/$alias'] | [0].TargetKeyId" --output text`
+if [ "$found" == "None" ]; then
+    echo 'Making new key'
+    key_id=`aws kms create-key --query 'KeyMetadata.KeyId' --output text`
+    echo "Making new alias $alias"
+    aws kms create-alias --target-key-id $key_id --alias-name "alias/$alias"
+else
+    echo "Found existing alias $alias, key $found"
+    key_id=$found
+fi
+
+# S3 bucket
+bucket=$app-secrets
+found=`aws s3api list-buckets --query "Buckets[?Name == '$bucket'] | [0].Name" --output text`
+
+if [ "$found" == "None" ]; then
+    echo "Creating bucket $bucket"
+    made=`aws s3api create-bucket --bucket $bucket --acl private --output text`
+else
+    echo "Found existing bucket $bucket"
+fi
+
+exit
+
+# IAM Role for instances
+default=$app-approle
+read -p "Enter a role for application (default: $default) :" in
+approle=${in:-$default}
+
+doc=`mktemp`
+echo "creating role $approle";
+cat <<DONE >>$doc
+{
+  "Id": "key-$app-policy-$RANDOM",
+  "Version": "`date +%Y-%m-%d`",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service" : "ec2.amazonaws.com" },
+      "Action": "sts:AssumeRole"
+    },
+  ]
+}
+DONE
+echo $doc
+aws iam create-role --role-name $approle --assume-role-policy-document file://$doc
+
+    {
+      "Effect" : "Allow",
+      "Action" : "s3:GetObject",
+      "Resource" : "arn:aws:s3:::$bucket"
+    }
+
+# Instance profile
+# Add role to instance profile
+
+# Role for users (or groups)
+# Assign role to users/groups
+
