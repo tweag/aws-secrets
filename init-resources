@@ -41,11 +41,10 @@ instancerole=$app-secrets-instances
 found=`aws iam list-roles --query "Roles[?RoleName == '$instancerole'] | [0].RoleId" --output text`
 if [ "$found" == "None" ]; then
     echo "Creating new role for instances: $instancerole"
-    policy=`mktemp`
-    echo "Writing to $policy"
-    cat <<-DONE >>$policy
+    trustpolicy=`mktemp`
+    cat <<-TRUSTPOLICY >>$trustpolicy
 	{
-	  "Id": "key-$app-secrets-instance-policy",
+	  "Id": "key-$app-secrets-instance-trust-policy",
 	  "Version": "2012-10-17",
 	  "Statement": [
 	    {
@@ -55,14 +54,25 @@ if [ "$found" == "None" ]; then
 	    }
 	  ]
 	}
-	DONE
-    aws iam create-role --role-name $instancerole --assume-role-policy-document file://$policy
-    #     {
-    #       "Effect" : "Allow",
-    #       "Action" : "s3:GetObject",
-    #       "Resource" : "arn:aws:s3:::$bucket"
-    #     }
-    #
+	TRUSTPOLICY
+    response=`aws iam create-role --role-name $instancerole --assume-role-policy-document file://$trustpolicy`
+    accesspolicy=`mktemp`
+    cat <<-ACCESSPOLICY >> $accesspolicy
+	{
+	  "Id": "key-$app-secrets-instance-access-policy",
+	  "Version": "2012-10-17",
+	  "Statement": [
+	    {
+	        "Effect" : "Allow",
+	        "Action" : "s3:GetObject",
+	        "Resource" : "arn:aws:s3:::$bucket"
+	    }
+	  ]
+	}
+	ACCESSPOLICY
+    aws iam put-role-policy --role-name $instancerole --policy-name $app-s3-access --policy-document file://$accesspolicy
+    rm $trustpolicy
+    rm $accesspolicy
 else
     echo "Found existing role $instancerole ($found)"
 fi
