@@ -1,0 +1,17 @@
+die() {
+    echo "$@"
+    exit
+}
+
+app=$1
+
+[ -z "$app" ] && die "Usage: $0 <application name>"
+
+[[ "$app" =~ ^[a-z0-9_]+$ ]] || die "The application name should consist only of a-z, 0-9 or _ charaters."
+
+echo "Purging resources for $app.";
+
+
+aws iam delete-role-policy --role-name "$app-secrets-instances" --policy-name="$app-s3-access"
+aws iam delete-role --role-name "$app-secrets-instances"
+
