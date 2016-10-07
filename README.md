@@ -32,7 +32,7 @@ To start an instance with the myapp-secrets IAM profile from the CLI:
 Description
 ===========
 
-`init-resources` creates the following aws resources:
+`init-resources` creates the following AWS resources:
 
 - A customer master key
 - An alias for the key
