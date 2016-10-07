@@ -33,26 +33,53 @@ To start an instance with the myapp-secrets IAM profile from the CLI:
 Description
 ===========
 
-`init-resources` creates the following AWS resources:
+This repository contains four bash scripts:
 
-- A customer master key
-- An alias for the key
-- An S3 bucket
-- A few roles to be used by an instance profile: one for S3 access, one for decryption
-- A group
-- An access policy for the group to get and put the key to S3.
-- An access policy for the group to encrypt keys
+- `init-resources`
+- `send-aws-secrets`
+- `receive-aws-secrets`
+- `purge-resources`
+
+They can be used to set up and maintain a file containing secret
+keys which can be used by an application running on an Amazon EC2
+instance.  Or they can be used to set the environment before running
+a docker container within an Amazon EC2 instance.
+
+*`init-resources`* creates the following AWS resources:
+
+- A customer master key (CMK).
+- An alias for the key.
+- An S3 bucket.
+- A few roles to be used by an instance profile: one for S3 access, one for decryption with the CMK.
+- A group with access policies to get/put to S3 and encrypt/decrypt with the CMK.
+
+*`send-aws-secrets`* takes an app name and a  filename as input and uses
+the CMK to encrypt it, then sends it to an object in the S3 bucket.
+
+*`receive-aws-secrets`* take an app name as input, and uses it to
+construct the name of the S3 bucket and object.  It then retrieves
+and decrypts the file and prints it to stdout.
+
+If the file contains lines of the form:
+
+```
+export X=yyyy
+```
+then calling `eval` on the output will put those
+variables into the current environment.  i.e.
+
+```
+eval `aws-retrieve-secrets myapp`
+```
+
+*`purge-resources`* removes the resources associated with this
+app which were created by `init-resources`.
 
 Notes
 ======
 
 - Instances must have the AWS CLI installed on them to use `aws-retrieve-secrets`.
 - Also they will need to have the region set (AWS_DEFAULT_REGION).
-- To retrieve keys and import them into your environment, use `eval`, for instance:
-
-```
-eval `aws-retrieve-secrets myapp`
-```
 
 
 References
