@@ -113,6 +113,33 @@ else
     echo "Group $group exists."
 fi
 
-# Role for users (or groups)
-# Assign role to users/groups
+sample_user=`aws iam list-users --query 'Users[0].UserName' --output text`
+echo "Done!"
+echo
+echo
+echo "Now what?"
+echo
+echo "Add a user to $group:"
+echo "# aws iam add-user-to-group --group-name $group --user-name $sample_user"
+echo
+echo "View the current users in $group:"
+echo "# aws iam get-group --group-name $group"
+echo
+echo "Create a file with an environment containing secret keys:"
+echo "echo 'export foo=bar$RANDOM' > .aws-secrets"
+echo
+echo "Encrypt and send it to s3 :"
+echo "send-aws-secrets $app .aws-secrets"
+echo
+echo "Retrieve it locally:"
+echo "retrieve-aws-secrets $app"
+echo
+echo "Start an instance that can access the secrets:"
+echo "aws ec2 start --policy zzzzz"
+echo
+echo "Get the secrets on the instance : "
+echo "curl http://192 > local-secrets"
+
+
+
 
