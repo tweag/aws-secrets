@@ -1,3 +1,5 @@
+#!/bin/sh -e
+
 die() {
     echo "$@"
     exit
@@ -11,8 +13,50 @@ app=$1
 
 echo "Purging resources for $app.";
 
-# aws iam delete-role-policy --role-name "$app-secrets-instances" --policy-name="$app-s3-read"
-# aws iam delete-role --role-name "$app-secrets-instances"
-# aws iam delete-group --group-name $app-manage-secrets
-# aws iam delete-instance-profile --instance-profile-name $app-secrets
+
+alias=$app-secrets
+bucket=$app-secrets
+instancerole=$app-secrets-instances
+instance_access_policy=$app-s3-read-secrets
+instance_decrypt_policy=$app-s3-decrypt-secrets
+instanceprofile=$app-secrets
+group=$app-manage-secrets
+group_policy=$app-secrets-s3-read-write
+s3_key=$app-aws-secrets
+
+echo "Deleting group policy"
+aws iam delete-group-policy --group-name $group --policy-name=$group_policy
+
+users=`aws iam get-group --group-name $group --query 'Users[*].UserName' --output text`
+for u in $users; do
+    echo "removing $u from group $group"
+    aws iam remove-user-from-group --user-name $u --group-name $group
+done
+
+echo "Deleting group $group"
+aws iam delete-group --group-name $group
+
+echo "Deleting role policies"
+aws iam delete-role-policy --role-name $instancerole --policy-name=$instance_access_policy
+aws iam delete-role-policy --role-name $instancerole --policy-name=$instance_decrypt_policy
+
+echo "Removing roles from instance profile"
+aws iam remove-role-from-instance-profile --instance-profile-name $instanceprofile --role-name $instancerole
+
+echo "Deleting instance profile"
+aws iam delete-instance-profile --instance-profile-name $instanceprofile
+
+echo "Deleting role $instancerole"
+aws iam delete-role --role-name $instancerole
+
+echo "Deleting bucket"
+aws s3api delete-object --bucket $bucket --key $s3_key
+aws s3api delete-bucket --bucket $bucket
+
+echo "Scheduling key deletion"
+key_id=`aws kms list-aliases --query "Aliases[?AliasName == 'alias/$alias'] | [0].TargetKeyId" --output text`
+aws kms schedule-key-deletion --key-id $key_id --pending-window-in-days 7
+
+echo "Deleting Key alias"
+aws kms delete-alias --alias-name "alias/$alias"
 
