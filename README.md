@@ -23,8 +23,11 @@ Now retrieve the secrets:
 
 The last one can be run by:
   - users in the `myapp-manage-secrets` group
-  - instances which have been started with the `myapp-secrets` iam profile
-  e.g. `aws ec2 run-instances ...--iam-instance-profile Name=myapp-secrets`
+  - instances which have been started with the `myapp-secrets` IAM profile
+
+To start an instance with the myapp-secrets IAM profile from the CLI:
+
+  `aws ec2 run-instances ...--iam-instance-profile Name=myapp-secrets`
 
 Description
 ===========
@@ -43,8 +46,7 @@ Notes
 ======
 
 - Images must have the AWS CLI installed on them.  Also they will need to have the region set,
-  by setting AWS_DEFAULT_REGION
-
+  by setting AWS_DEFAULT_REGION.
 
 
 References
