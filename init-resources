@@ -117,6 +117,7 @@ fi
 # Group for managing secrets
 group=$app-manage-secrets
 group_policy=$app-secrets-s3-read-write
+group_encrypt_policy=$app-encrypt-secrets
 found=`aws iam list-groups --query "Groups[?GroupName == '$group'] | [0].GroupName" --output text`
 if [ "$found" == "None" ]; then
     echo "Creating group $group."
@@ -133,13 +134,31 @@ if [ "$found" == "None" ]; then
               "s3:GetObject",
               "s3:PutObject"
             ],
-	        "Resource" : "arn:aws:s3:::$bucket"
+	        "Resource" : "arn:aws:s3:::$bucket/*"
 	    }
 	  ]
 	}
 	ACCESSPOLICY
     aws iam put-group-policy --group-name $group --policy-name $group_policy \
         --policy-document file://$accesspolicy
+    encryptpolicy=`mktemp`
+    cat <<-ENCRYPTPOLICY >> $encryptpolicy
+	{
+	  "Version": "2012-10-17",
+	  "Id": "key-$app-secrets-encrypt-policy",
+	  "Statement": [
+	    {
+	      "Effect": "Allow",
+	      "Action": [ "kms:Encrypt", "kms:Decrypt" ],
+	      "Resource": "$key_arn"
+	    }
+	  ]
+	}
+	ENCRYPTPOLICY
+    aws iam put-group-policy --group-name $group --policy-name $group_encrypt_policy \
+        --policy-document file://$encryptpolicy
+    rm $encryptpolicy
+
 else
     echo "Group $group exists."
 fi

@@ -22,10 +22,12 @@ instance_decrypt_policy=$app-s3-decrypt-secrets
 instanceprofile=$app-secrets
 group=$app-manage-secrets
 group_policy=$app-secrets-s3-read-write
+group_encrypt_policy=$app-encrypt-secrets
 s3_key=$app-aws-secrets
 
 echo "Deleting group policy"
 aws iam delete-group-policy --group-name $group --policy-name=$group_policy
+aws iam delete-group-policy --group-name $group --policy-name=$group_encrypt_policy
 
 users=`aws iam get-group --group-name $group --query 'Users[*].UserName' --output text`
 for u in $users; do
