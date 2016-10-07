@@ -47,6 +47,11 @@ Notes
 
 - Instances must have the AWS CLI installed on them to use `aws-retrieve-secrets`.
 - Also they will need to have the region set (AWS_DEFAULT_REGION).
+- To retrieve keys and import them into your environment, use `eval`, for instance:
+
+```
+eval `aws-retrieve-secrets myapp`
+```
 
 
 References
