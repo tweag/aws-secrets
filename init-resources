@@ -40,7 +40,7 @@ else
     echo "Found existing bucket $bucket"
 fi
 
-# IAM Role for instances
+# IAM Role for instance profile
 instancerole=$app-secrets-instances
 instance_access_policy=$app-s3-read
 found=`aws iam list-roles --query "Roles[?RoleName == '$instancerole'] | [0].RoleId" --output text`
@@ -83,12 +83,24 @@ else
     echo "Found existing role $instancerole ($found)"
 fi
 
+# Instance profile for instances
+instanceprofile=$app-secrets
+found=`aws iam list-instance-profiles \
+    --query "InstanceProfiles[?InstanceProfileName == '$instanceprofile'] | [0].InstanceProfileId" --output text`
+if [ "$found" == "None" ]; then
+    echo "Creating new instance profile $instanceprofile."
+    response=`aws iam create-instance-profile --instance-profile-name $instanceprofile`
+    aws iam add-role-to-instance-profile --instance-profile-name $instanceprofile --role-name $instancerole
+else
+    echo "Found existing instance profile ($found)"
+fi
+
 # Group for managing secrets
 group=$app-manage-secrets
 group_policy=$app-secrets-s3-read-write
 found=`aws iam list-groups --query "Groups[?GroupName == '$group'] | [0].GroupName" --output text`
 if [ "$found" == "None" ]; then
-    echo "Creating group $group"
+    echo "Creating group $group."
     response=`aws iam create-group --group-name $group`
     accesspolicy=`mktemp`
     cat <<-ACCESSPOLICY >> $accesspolicy
@@ -119,25 +131,25 @@ echo
 echo
 echo "Now what?"
 echo
-echo "Add a user to $group:"
-echo "# aws iam add-user-to-group --group-name $group --user-name $sample_user"
+echo "# Add a user to $group:"
+echo "aws iam add-user-to-group --group-name $group --user-name $sample_user"
 echo
-echo "View the current users in $group:"
-echo "# aws iam get-group --group-name $group"
+echo "# View the current users in $group:"
+echo "aws iam get-group --group-name $group"
 echo
-echo "Create a file with an environment containing secret keys:"
+echo "# Create a file with an environment containing secret keys:"
 echo "echo 'export foo=bar$RANDOM' > .aws-secrets"
 echo
-echo "Encrypt and send it to s3 :"
+echo "# Encrypt and send it to s3 :"
 echo "send-aws-secrets $app .aws-secrets"
 echo
-echo "Retrieve it locally:"
+echo "# Retrieve it locally:"
 echo "retrieve-aws-secrets $app"
 echo
-echo "Start an instance that can access the secrets:"
-echo "aws ec2 start --policy zzzzz"
+echo "# Start an instance that can access the secrets:"
+echo "aws ec2 run-instance --image-id ami-2d39803a --iam-instance-profile Arn=string,Name=string"
 echo
-echo "Get the secrets on the instance : "
+echo "# Get the secrets on the instance : "
 echo "curl http://192 > local-secrets"
 
 
