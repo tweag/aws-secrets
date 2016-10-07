@@ -173,8 +173,6 @@ echo "# View AWS crednetials on the instance : "
 echo "ssh ...instance ip..."
 echo "curl -L http://169.254.169.254/latest/meta-data/iam/security-credentials/$instancerole"
 echo
-
-
-
-
+echo "# Copy retrieve-aws-secrets to your instance and run it there to retrieve the secrets"
+echo "scp retrieve-aws-secrets ..instance ip.."
 
