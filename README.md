@@ -23,7 +23,7 @@ Now retrieve the secrets:
 
 The last one can be run by:
   - users in the `myapp-manage-secrets` group
-  - instances which have been started with the `myapp-secrets` IAM profile
+  - programs on ec2 instances which have been started with the `myapp-secrets` IAM profile
 
 To start an instance with the myapp-secrets IAM profile from the CLI:
 
