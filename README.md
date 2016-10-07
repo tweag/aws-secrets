@@ -8,24 +8,24 @@ Synopsis
 Installation:
 ```
 git clone -o github https://github.com/promptworks/aws-secrets
-cp aws-secrets-* /usr/local/bin
+cp aws-secrets/aws-secrets-* /usr/local/bin
 ```
 
 Set up AWS resources:
 ```
-./aws-secrets-init-resources myapp
+aws-secrets-init-resources myapp
 ```
 
 Make some secrets, send them to the cloud:
 ```
 echo "export SECRET=xyzzy" > aws-secrets
-./aws-secrets-send myapp aws-secrets
+aws-secrets-send myapp aws-secrets
 ```
 
 Now retrieve the secrets:
 
 ```
-./aws-retrieve-secrets myapp
+aws-retrieve-secrets myapp
 ```
 
 The last one can be run by:
