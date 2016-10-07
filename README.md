@@ -45,8 +45,8 @@ Description
 Notes
 ======
 
-- Images must have the AWS CLI installed on them.  Also they will need to have the region set,
-  by setting AWS_DEFAULT_REGION.
+- Instances must have the AWS CLI installed on them to use `aws-retrieve-secrets`.
+- Also they will need to have the region set (AWS_DEFAULT_REGION).
 
 
 References
