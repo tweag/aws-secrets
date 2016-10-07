@@ -5,6 +5,12 @@ Manage secrets on AWS instances by storing them in encrypted S3 objects to which
 Synopsis
 ========
 
+Installation:
+```
+git clone -o github https://github.com/promptworks/aws-secrets
+cp aws-secrets-* /usr/local/bin
+```
+
 Set up AWS resources:
 ```
 ./aws-secrets-init-resources myapp
