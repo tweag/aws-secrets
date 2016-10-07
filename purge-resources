@@ -11,7 +11,8 @@ app=$1
 
 echo "Purging resources for $app.";
 
-#aws iam delete-role-policy --role-name "$app-secrets-instances" --policy-name="$app-s3-read"
-#aws iam delete-role --role-name "$app-secrets-instances"
-aws iam delete-group --group-name $app-manage-secrets
+# aws iam delete-role-policy --role-name "$app-secrets-instances" --policy-name="$app-s3-read"
+# aws iam delete-role --role-name "$app-secrets-instances"
+# aws iam delete-group --group-name $app-manage-secrets
+# aws iam delete-instance-profile --instance-profile-name $app-secrets
 
