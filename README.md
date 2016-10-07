@@ -7,13 +7,13 @@ Synopsis
 
 Set up AWS resources:
 ```
-./init-resources myapp
+./aws-secrets-init-resources myapp
 ```
 
 Make some secrets, send them to the cloud:
 ```
 echo "export SECRET=xyzzy" > aws-secrets
-./send-aws-secrets myapp aws-secrets
+./aws-secrets-send myapp aws-secrets
 ```
 
 Now retrieve the secrets:
@@ -35,17 +35,17 @@ Description
 
 This repository contains four bash scripts:
 
-- `init-resources`
-- `send-aws-secrets`
-- `receive-aws-secrets`
-- `purge-resources`
+- `aws-secrets-init-resources`
+- `aws-secrets-send`
+- `aws-secrets-receive`
+- `aws-secrets-purge-resources`
 
 They can be used to set up and maintain a file containing secret
 keys which can be used by an application running on an Amazon EC2
 instance.  Or they can be used to set the environment before running
 a docker container within an Amazon EC2 instance.
 
-*`init-resources`* creates the following AWS resources:
+*`aws-secrets-init-resources`* creates the following AWS resources:
 
 - A customer master key (CMK).
 - An alias for the key.
@@ -53,10 +53,10 @@ a docker container within an Amazon EC2 instance.
 - A few roles to be used by an instance profile: one for S3 access, one for decryption with the CMK.
 - A group with access policies to get/put to S3 and encrypt/decrypt with the CMK.
 
-*`send-aws-secrets`* takes an app name and a  filename as input and uses
+*`aws-secrets-send`* takes an app name and a  filename as input and uses
 the CMK to encrypt it, then sends it to an object in the S3 bucket.
 
-*`receive-aws-secrets`* take an app name as input, and uses it to
+*`aws-secrets-receive`* take an app name as input, and uses it to
 construct the name of the S3 bucket and object.  It then retrieves
 and decrypts the file and prints it to stdout.
 
@@ -72,8 +72,8 @@ variables into the current environment.  i.e.
 eval `aws-retrieve-secrets myapp`
 ```
 
-*`purge-resources`* removes the resources associated with this
-app which were created by `init-resources`.
+*`aws-secrets-purge-resources`* removes the resources associated with this
+app which were created by `aws-secrets-init-resources`.
 
 Notes
 ======
