@@ -29,6 +29,7 @@ else
     echo "Found existing alias $alias, key $found"
     key_id=$found
 fi
+key_arn=`aws kms list-keys --query "Keys[?KeyId == '$key_id' ] | [0].KeyArn" --output text`
 
 # S3 bucket
 bucket=$app-secrets
@@ -42,7 +43,8 @@ fi
 
 # IAM Role for instance profile
 instancerole=$app-secrets-instances
-instance_access_policy=$app-s3-read
+instance_access_policy=$app-s3-read-secrets
+instance_decrypt_policy=$app-s3-decrypt-secrets
 found=`aws iam list-roles --query "Roles[?RoleName == '$instancerole'] | [0].RoleId" --output text`
 if [ "$found" == "None" ]; then
     echo "Creating new role for instances: $instancerole"
@@ -71,7 +73,7 @@ if [ "$found" == "None" ]; then
 	    {
 	        "Effect" : "Allow",
 	        "Action" : "s3:GetObject",
-	        "Resource" : "arn:aws:s3:::$bucket"
+	        "Resource" : "arn:aws:s3:::$bucket/*"
 	    }
 	  ]
 	}
@@ -79,6 +81,23 @@ if [ "$found" == "None" ]; then
     aws iam put-role-policy --role-name $instancerole --policy-name $instance_access_policy \
         --policy-document file://$accesspolicy
     rm $accesspolicy
+    decryptpolicy=`mktemp`
+    cat <<-DECRYPTPOLICY >> $decryptpolicy
+	{
+	  "Version": "2012-10-17",
+	  "Id": "key-$app-secrets-instance-decrypt-policy",
+	  "Statement": [
+	    {
+	      "Effect": "Allow",
+	      "Action": "kms:Decrypt",
+	      "Resource": "$key_arn"
+	    }
+	  ]
+	}
+	DECRYPTPOLICY
+    aws iam put-role-policy --role-name $instancerole --policy-name $instance_decrypt_policy \
+        --policy-document file://$decryptpolicy
+    rm $decryptpolicy
 else
     echo "Found existing role $instancerole ($found)"
 fi
@@ -147,10 +166,14 @@ echo "# Retrieve it locally:"
 echo "retrieve-aws-secrets $app"
 echo
 echo "# Start an instance that can access the secrets:"
-echo "aws ec2 run-instance --image-id ami-2d39803a --iam-instance-profile Arn=string,Name=string"
+echo "aws ec2 run-instances --image-id ami-2d39803a --instance-type t2.nano --key-name bduggan \
+--iam-instance-profile Name=$instanceprofile"
 echo
-echo "# Get the secrets on the instance : "
-echo "curl http://192 > local-secrets"
+echo "# View AWS crednetials on the instance : "
+echo "ssh ...instance ip..."
+echo "curl -L http://169.254.169.254/latest/meta-data/iam/security-credentials/$instancerole"
+echo
+
 
 
 
