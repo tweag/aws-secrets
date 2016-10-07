@@ -144,29 +144,27 @@ else
     echo "Group $group exists."
 fi
 
-sample_user=`aws iam list-users --query 'Users[0].UserName' --output text`
 echo "Done!"
 echo
 echo
 echo "Now what?"
 echo
-echo "# Add a user to $group:"
-echo "aws iam add-user-to-group --group-name $group --user-name $sample_user"
-echo
-echo "# View the current users in $group:"
+echo "# List users, add them to the group $group:"
+echo  aws iam list-users --query 'Users[0].UserName'
+echo "aws iam add-user-to-group --group-name $group --user-name some_user"
 echo "aws iam get-group --group-name $group"
 echo
 echo "# Create a file with an environment containing secret keys:"
-echo "echo 'export foo=bar$RANDOM' > .aws-secrets"
+echo "echo 'export foo=bar$RANDOM' > aws-secrets"
 echo
 echo "# Encrypt and send it to s3 :"
-echo "send-aws-secrets $app .aws-secrets"
+echo "send-aws-secrets $app aws-secrets"
 echo
-echo "# Retrieve it locally:"
+echo "# Retrieve it:"
 echo "retrieve-aws-secrets $app"
 echo
 echo "# Start an instance that can access the secrets:"
-echo "aws ec2 run-instances --image-id ami-2d39803a --instance-type t2.nano --key-name bduggan \
+echo "aws ec2 run-instances --image-id ami-2d39803a --instance-type t2.nano --key-name some_aws_key \
 --iam-instance-profile Name=$instanceprofile"
 echo
 echo "# View AWS crednetials on the instance : "
