@@ -1,6 +1,6 @@
 aws-secrets
 ===========
-Manage secrets on AWS instances by storing them in encrypted S3 objects.
+Manage secrets on AWS instances with KMS encryption, IAM roles and S3 storage.
 
 Synopsis
 ========
