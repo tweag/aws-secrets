@@ -20,8 +20,8 @@ aws-secrets-init-resources quizzo
 
 Make some secrets, send them to the cloud:
 ```
-echo "export SECRET=xyzzy" > aws-secrets
-aws-secrets-send quizzo aws-secrets
+echo "export SECRET=xyzzy" > quizzo-secrets
+aws-secrets-send quizzo quizzo-secrets
 ```
 
 Now retrieve the secrets:
