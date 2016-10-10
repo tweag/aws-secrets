@@ -24,7 +24,7 @@ echo "export SECRET=xyzzy" > quizzo-secrets
 aws-secrets-send quizzo quizzo-secrets
 ```
 
-Now retrieve the secrets:
+Now retrieve the secrets and print them to stdout:
 
 ```
 aws-get-secrets quizzo
