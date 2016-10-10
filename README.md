@@ -49,10 +49,10 @@ This repository contains a handful of scripts:
 - `aws-secrets-purge-resources`
 - `aws-secrets-setup-env`
 
-They can be used to set up and maintain a file containing secret
-keys which can be used by an application running on an Amazon EC2
-instance.  Or they can be used to set the environment for an
-application running in a a docker container within an Amazon EC2 instance.
+They can be used to set up and maintain a file containing environment
+variables which can then be used by an application running on an Amazon EC2
+instance.  They can also be used when running an application in a
+docker container on an EC2 instance.
 
 *`aws-secrets-init-resources`* creates the following AWS resources:
 
