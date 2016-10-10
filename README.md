@@ -9,6 +9,7 @@ Installation:
 ```
 git clone -o github https://github.com/promptworks/aws-secrets
 make install
+# (or just copy `bin/\*` to somewhere in your PATH)
 ```
 
 Set up AWS resources:

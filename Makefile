@@ -1,3 +1,3 @@
 install:
-	install -d bin/* /tmp/local/bin
+	install -d bin/* /usr/local/bin
 
