@@ -12,30 +12,30 @@ sudo make install
 # (or just copy `bin/*` to somewhere in your PATH)
 ```
 
-Set up AWS resources:
+Set up AWS resources for an app named quizzo:
 ```
-aws-secrets-init-resources myapp
+aws-secrets-init-resources quizzo
 ```
 
 Make some secrets, send them to the cloud:
 ```
 echo "export SECRET=xyzzy" > aws-secrets
-aws-secrets-send myapp aws-secrets
+aws-secrets-send quizzo aws-secrets
 ```
 
 Now retrieve the secrets:
 
 ```
-aws-get-secrets myapp
+aws-get-secrets quizzo
 ```
 
 The last one can be run by:
-  - users in the `myapp-manage-secrets` group
-  - programs on ec2 instances which have been started with the `myapp-secrets` IAM profile
+  - users in the `quizzo-manage-secrets` group
+  - programs on ec2 instances which have been started with the `quizzo-secrets` IAM profile
 
-To start an instance with the myapp-secrets IAM profile from the CLI:
+To start an instance with the quizzo-secrets IAM profile from the CLI:
 
-  `aws ec2 run-instances ...--iam-instance-profile Name=myapp-secrets`
+  `aws ec2 run-instances ...--iam-instance-profile Name=quizzo-secrets`
 
 Description
 ===========
@@ -77,7 +77,7 @@ then calling `eval` on the output will put those
 variables into the current environment.  i.e.
 
 ```
-eval `aws-get-secrets myapp`
+eval `aws-get-secrets quizzo`
 ```
 
 *`aws-secrets-run-in-env`* is a short script that does the above and
@@ -90,9 +90,9 @@ Examples
 =======
 To use this in a docker file, you can addd this file:
 ```
-CMD ["aws-run-in-env", "myapp", "myapp-script"]
+CMD ["aws-run-in-env", "quizzo", "start-quizzo"]
 ```
-where "myapp" is the name of your app, and "myapp-script"
+where "quizzo" is the name of your app, and "start-quizzo"
 is the script that starts the app.
 
 Notes
