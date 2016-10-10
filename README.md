@@ -24,7 +24,7 @@ echo "export SECRET=xyzzy" > quizzo-env
 aws-secrets-send quizzo quizzo-env
 ```
 
-Now retrieve the secrets and print them to stdout:
+Retrieve the secrets and print them to stdout:
 
 ```
 aws-get-secrets quizzo
