@@ -101,7 +101,7 @@ Notes
 
 - These scripts depend on having the AWS CLI installed.  (See references below)
 
-- It may be necessary to explicitly set the region (in the env variable AWS_DEFAULT_REGION).
+- It may be necessary to explicitly set the region (e.g. using the AWS_DEFAULT_REGION environment variable).
 
 References
 ==========
