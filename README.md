@@ -45,11 +45,12 @@ This repository contains four bash scripts:
 - `aws-secrets-send`
 - `aws-secrets-receive`
 - `aws-secrets-purge-resources`
+- `aws-secrets-setup-env`
 
 They can be used to set up and maintain a file containing secret
 keys which can be used by an application running on an Amazon EC2
-instance.  Or they can be used to set the environment before running
-a docker container within an Amazon EC2 instance.
+instance.  Or they can be used to set the environment for an
+application running in a a docker container within an Amazon EC2 instance.
 
 *`aws-secrets-init-resources`* creates the following AWS resources:
 
@@ -78,15 +79,27 @@ variables into the current environment.  i.e.
 eval `aws-retrieve-secrets myapp`
 ```
 
+*`aws-secrets-run-in-env`* is a short script that does the above and
+then executes another program, with its arguments.
+
 *`aws-secrets-purge-resources`* removes the resources associated with this
 app which were created by `aws-secrets-init-resources`.
+
+Examples
+=======
+To use this in a docker file, you can addd this file:
+```
+CMD ["aws-run-in-env", "myapp", "myapp-script"]
+```
+where "myapp" is the name of your app, and "myapp-script"
+is the script that starts the app.
 
 Notes
 ======
 
-- Instances must have the AWS CLI installed on them to use `aws-retrieve-secrets`.
-- Also they will need to have the region set (AWS_DEFAULT_REGION).
+- These scripts depend on having the AWS CLI installed.  (See references below)
 
+- It may be necessary to explicitly set the region (in the env variable AWS_DEFAULT_REGION).
 
 References
 ==========
