@@ -13,7 +13,7 @@ sudo make install
 # (or just copy `bin/*` to somewhere in your PATH)
 ```
 
-Set up AWS resources for an app named quizzo:
+Set up AWS resources for an application named quizzo:
 ```
 aws-secrets-init-resources quizzo
 ```
