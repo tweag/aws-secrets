@@ -41,7 +41,7 @@ To start an instance with the quizzo-secrets IAM profile from the CLI:
 Description
 ===========
 
-This repository contains four bash scripts:
+This repository contains a handful of scripts:
 
 - `aws-secrets-init-resources`
 - `aws-secrets-send`
