@@ -45,7 +45,7 @@ This repository contains four bash scripts:
 
 - `aws-secrets-init-resources`
 - `aws-secrets-send`
-- `aws-secrets-receive`
+- `aws-secrets-get`
 - `aws-secrets-purge-resources`
 - `aws-secrets-setup-env`
 
@@ -65,7 +65,7 @@ application running in a a docker container within an Amazon EC2 instance.
 *`aws-secrets-send`* takes an app name and a  filename as input and uses
 the CMK to encrypt it, then sends it to an object in the S3 bucket.
 
-*`aws-secrets-receive`* take an app name as input, and uses it to
+*`aws-secrets-get`* take an app name as input, and uses it to
 construct the name of the S3 bucket and object.  It then retrieves
 and decrypts the file and prints it to stdout.
 
