@@ -8,7 +8,7 @@ Synopsis
 Installation:
 ```
 git clone -o github https://github.com/promptworks/aws-secrets
-cp aws-secrets/aws-secrets-* /usr/local/bin
+make install
 ```
 
 Set up AWS resources:
