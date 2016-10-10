@@ -89,7 +89,7 @@ app which were created by `aws-secrets-init-resources`.
 
 Examples
 =======
-To use this in a docker file, you can add this file:
+To use this in a docker file, you can add this line:
 ```
 CMD ["aws-run-in-env", "quizzo", "start-quizzo"]
 ```
