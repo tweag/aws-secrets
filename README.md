@@ -26,7 +26,7 @@ aws-secrets-send myapp aws-secrets
 Now retrieve the secrets:
 
 ```
-aws-retrieve-secrets myapp
+aws-get-secrets myapp
 ```
 
 The last one can be run by:
@@ -77,7 +77,7 @@ then calling `eval` on the output will put those
 variables into the current environment.  i.e.
 
 ```
-eval `aws-retrieve-secrets myapp`
+eval `aws-get-secrets myapp`
 ```
 
 *`aws-secrets-run-in-env`* is a short script that does the above and
