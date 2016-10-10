@@ -106,3 +106,4 @@ References
 
 - https://www.promptworks.com/blog/handling-environment-secrets-in-docker-on-the-aws-container-service
 - http://docs.aws.amazon.com/cli/latest/userguide/installing.html
+- https://gist.github.com/themoxman/1d137b9a1729ba8722e4
