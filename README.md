@@ -9,7 +9,7 @@ Installation:
 ```
 git clone -o github https://github.com/promptworks/aws-secrets
 cd aws-secrets
-sudo make install
+make install
 # (or just copy `bin/*` to somewhere in your PATH)
 ```
 
