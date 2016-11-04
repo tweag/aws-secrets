@@ -29,7 +29,7 @@ aws-secrets-send quizzo quizzo-env
 Retrieve the secrets and print them to stdout:
 
 ```
-aws-get-secrets quizzo
+aws-secrets-get quizzo
 ```
 
 The last one can be run by:
@@ -80,7 +80,7 @@ then calling `eval` on the output will put those
 variables into the current environment.  i.e.
 
 ```
-eval `aws-get-secrets quizzo`
+eval `aws-secrets-get quizzo`
 ```
 
 *`aws-secrets-run-in-env`* is a short script that does the above and
