@@ -5,11 +5,13 @@ Manage secrets on AWS instances with KMS encryption, IAM roles and S3 storage.
 Synopsis
 ========
 
+aws-secrets requires [aws-cli](https://aws.amazon.com/cli/) version 1.8 or later.
+
 Installation:
 ```
 git clone -o github https://github.com/promptworks/aws-secrets
 cd aws-secrets
-sudo make install
+make install
 # (or just copy `bin/*` to somewhere in your PATH)
 ```
 
