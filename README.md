@@ -93,7 +93,7 @@ Examples
 =======
 To use this in a docker file, add a line like this:
 ```
-CMD ["aws-run-in-env", "quizzo", "start-quizzo"]
+CMD ["aws-secrets-run-in-env", "quizzo", "start-quizzo"]
 ```
 where "quizzo" is the name of your app, and "start-quizzo"
 is the script that starts the app.
