@@ -48,8 +48,8 @@ This repository contains a handful of scripts:
 - `aws-secrets-init-resources`
 - `aws-secrets-send`
 - `aws-secrets-get`
+- `aws-secrets-run-in-env`
 - `aws-secrets-purge-resources`
-- `aws-secrets-setup-env`
 
 They can be used to set up and maintain a file containing environment
 variables which can then be used by an application running on an Amazon EC2
