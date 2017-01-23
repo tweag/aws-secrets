@@ -22,7 +22,7 @@ aws-secrets-init-resources quizzo
 
 Make some secrets, send them to the cloud:
 ```
-echo "export SECRET=xyzzy" > quizzo-env
+echo "SECRET=xyzzy" > quizzo-env
 aws-secrets-send quizzo quizzo-env
 ```
 
@@ -74,13 +74,13 @@ and decrypts the file and prints it to stdout.
 If the file contains lines of the form:
 
 ```
-export X=yyyy
+X=yyyy
 ```
 then calling `eval` on the output will put those
 variables into the current environment.  i.e.
 
 ```
-eval `aws-secrets-get quizzo`
+export $(aws-secrets-get quizzo | xargs)
 ```
 
 *`aws-secrets-run-in-env`* is a short script that does the above and
