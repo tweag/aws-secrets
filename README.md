@@ -79,11 +79,11 @@ If the file contains lines of the form:
 ```
 X=yyyy
 ```
-then calling `eval` on the output will put those
+then exporting the output will put those
 variables into the current environment.  i.e.
 
 ```
-export $(aws-secrets-get quizzo | xargs)
+export `aws-secrets-get quizzo`
 ```
 
 *`aws-secrets-run-in-env`* is a short script that does the above and
