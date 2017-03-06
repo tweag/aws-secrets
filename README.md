@@ -20,13 +20,15 @@ Set up AWS resources for an application named quizzo:
 aws-secrets-init-resources quizzo
 ```
 
-Make some secrets, send them to the cloud:
+Make some secrets, send them to the cloud and the AWS S3 bucket:
 ```
 echo "SECRET=xyzzy" > quizzo-env
 aws-secrets-send quizzo quizzo-env
 ```
 
-Retrieve the secrets and print them to stdout:
+Each send overwrites the existing secrets in the store.
+
+Retrieve the secrets and print them to `STDOUT`:
 
 ```
 aws-secrets-get quizzo
@@ -34,14 +36,14 @@ aws-secrets-get quizzo
 
 The last one can be run by:
   - users in the `quizzo-manage-secrets` group
-  - programs on ec2 instances which have been started with the `quizzo-secrets` IAM profile
+  - programs on EC2 instances which have been started with the `quizzo-secrets` IAM profile
 
 To start an EC2 instance with the quizzo-secrets IAM profile from the CLI:
 
   `aws ec2 run-instances ...--iam-instance-profile Name=quizzo-secrets`
 
-To start an ECS cluster with the quizzo IAM profile, select quizzo-secrets-instances from the
-Container Instance IAM Role selection on the Create Cluster screen.
+To start an ECS cluster with the `quizzo` IAM profile, select `quizzo-secrets-instances` from the
+Container Instance IAM Role selection on the Create Cluster screen. Or you could also start an ECS task with the `quizzo` IAM role by selecting it in your Task Definition.
 
 Description
 ===========
