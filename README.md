@@ -108,7 +108,9 @@ Notes
 
 - These scripts depend on having the AWS CLI installed.  (See references below)
 
-- It may be necessary to explicitly set the region (e.g. using the AWS_DEFAULT_REGION environment variable).
+- Changing AWS_DEFAULT_REGION (or the aws-cli configuration) will effect the region used for API calls.
+
+- Changing AWS_SECRETS_BUCKET_REGION will specify the region in which the S3 bucket is created.
 
 References
 ==========
