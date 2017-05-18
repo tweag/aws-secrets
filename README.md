@@ -16,7 +16,7 @@ aws-secrets requires [aws-cli](https://aws.amazon.com/cli/) version 1.8 or later
 
 Installation:
 ```
-git clone -o github https://github.com/promptworks/aws-secrets
+git clone -o github https://github.com/prx/aws-secrets
 cd aws-secrets
 make install
 # (or just copy `bin/*` to somewhere in your PATH)
